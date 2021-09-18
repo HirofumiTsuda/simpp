@@ -12,7 +12,7 @@
 
 namespace simpp{
   using coro_t = boost::coroutines2::coroutine<std::shared_ptr<Event> >;  
-      std::shared_ptr<Event> get_ptr();
+    std::shared_ptr<Event> get_ptr();
     bool is_ok();
     bool is_pending();
 
@@ -34,15 +34,17 @@ namespace simpp{
 
   void Event::set_done(){
     if(done)
-      throw std::runtime_error("Event is already done!")
+      throw std::runtime_error("Event is already done!");
     done = true;
   }
 
   void Event::succeed(){
+    ok = true;
     env->schedule(shared_from_this());
   }
 
   void Timeout::cast_into_queue(){
+    ok = true;
     env->schedule(shared_from_this(), 1, delay);
   }
 
@@ -51,8 +53,14 @@ namespace simpp{
       generator = std::make_unique<coro_t::pull_type>(coro_t::pull_type(f));
   }
 
-  void Process::resume(std::shared_ptr<Event> &event){
+  void Process::execute(){
+      auto ptr = std::dynamic_pointer_cast<Process>(Event::shared_from_this());
+      std::shared_ptr<Initializer> ini = std::make_shared<Initializer>(env, std::move(ptr));
+      ini->execute();
+  }
 
+  void Process::resume(std::shared_ptr<Event>& event){
+    std::shared_ptr<Event> res;
     while(true){
       /*
       Check if the event is already triggered.
@@ -61,8 +69,9 @@ namespace simpp{
       */
       if(*generator){
         // generator is valid
+	std::cout << "res" << event->is_ok() << std::endl;	
         if(event->is_ok()){
-          event = generator->get();
+          res = generator->get();
           (*generator)();
         }else{
           throw std::runtime_error("Generator is invalid");
@@ -75,9 +84,12 @@ namespace simpp{
         env->schedule(shared_from_this());
         break;
       }
-      event->callbacks.push_back([&](std::shared_ptr<Event> &event){
-        resume(event);
-      });
+      if(res != nullptr && !res->is_done()){
+	event->callbacks.push_back([&](std::shared_ptr<Event> &event){
+				     resume(event);
+				   });
+	break;
+      }
     }
   }
   
@@ -85,7 +97,9 @@ namespace simpp{
     std::function<void(std::shared_ptr<Event> &)> f = [&](std::shared_ptr<Event> &x){
       process->resume(x);
       };
-    this->callbacks.push_back(f);
+    
+    callbacks.push_back(f);
+    ok = true;
     env->schedule(shared_from_this(), 0, 0.0);
   }
   

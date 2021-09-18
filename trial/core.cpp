@@ -1,14 +1,21 @@
 #include "core.hpp"
 
 #include <iostream>
+#include <functional>
 #include <memory>
+
+#include <boost/coroutine2/coroutine.hpp>
 
 #include "event.hpp"
 
 namespace simpp{
 
+  using coro_t = boost::coroutines2::coroutine<std::shared_ptr<Event> >;    
+
   QueueEvent::QueueEvent(const double time, const int id, const int priority, const std::shared_ptr<Event> event) 
-  : time(time), id(id), priority(priority), event(event) {}
+  : time(time), id(id), priority(priority), event(event) {
+    std::cout << "queue : " << this->event->is_ok() << std::endl;
+  }
   
   bool QueueEvent::operator<(const QueueEvent &other) const {
     if(time != other.time)
@@ -37,14 +44,34 @@ namespace simpp{
     env->now = initial_time;
     return std::move(env);
   }
+
+  void Environment::step(){
+    QueueEvent item = pq.top();
+    pq.pop();
+    auto event = item.get_event();
+    this->now = item.get_time();
+    auto callbacks = std::move(event->callbacks);
+    event->callbacks.clear();
+    event->set_done();
+    std::cout << "size:" << callbacks.size() << std::endl;   
+    for(auto f : callbacks){
+      std::cout << "callback" << std::endl;
+      f(event);
+    }
+  }
+
+  void Environment::run(double until){
+    while(pq.size() > 0){
+      step();
+    }
+  }
   
   double Environment::get_time(){ 
     return this->now; 
   }
 
-
   std::shared_ptr<Event> Environment::event(){
-    return std::make_shared<Event>(shared_from_this());;
+    return std::make_shared<Event>(shared_from_this());
   }
 
   std::shared_ptr<Timeout> Environment::timeout(double delay){
@@ -53,9 +80,15 @@ namespace simpp{
     return time_event;
   }
 
-  void Environment::schedule(std::shared_ptr<Event> event, int priority, double delay){ 
-    pq.emplace(QueueEvent(now + delay, 0, priority, event));
+  std::shared_ptr<Process> Environment::process(const std::function<void(coro_t::push_type&)> f){
+    return std::make_shared<Process>(shared_from_this(), f);
+  }
+
+  void Environment::schedule(std::shared_ptr<Event> event, int priority, double delay){    
+    pq.emplace(now + delay, 0, priority, event);
   }
 
 } //simpp
+
+
 

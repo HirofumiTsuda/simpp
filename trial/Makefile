@@ -1,7 +1,7 @@
 CC			= g++
-CFLAGS		= -lboost_context
-TARGET		= main
-SRCS    	= main.cpp event.cpp core.cpp
+CFLAGS		= -lboost_context -g -O0
+TARGET		= test
+SRCS    	= test.cpp event.cpp core.cpp
 OBJS    	= $(SRCS:.cpp=.o)
 
 
@@ -15,3 +15,4 @@ $(OBJS): $(SRCS)
 all:            $(TARGET)
 
 clean:;         rm -f *.o *~ $(TARGET)
+

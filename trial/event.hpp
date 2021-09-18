@@ -16,6 +16,7 @@ namespace simpp{
   public:
     // Constructor
     Event(const std::shared_ptr<Environment>& _env) : env(_env) {}
+    virtual ~Event() {}
     // Methods
     void succeed();
     std::shared_ptr<Event> get_ptr();
@@ -26,7 +27,7 @@ namespace simpp{
     std::vector<std::function<void(std::shared_ptr<Event> &)>> callbacks;  
   protected:
     bool ok;
-    bool defused;
+    bool defused; 
     bool pending;
     bool done;
     std::shared_ptr<Environment> env;
@@ -43,6 +44,7 @@ namespace simpp{
   class Process : public Event{
   public:
    Process(const std::shared_ptr<Environment>& , const std::function<void(coro_t::push_type&)> );
+   void execute();
    void resume(std::shared_ptr<Event> &);
   private:
    std::unique_ptr<coro_t::pull_type> generator;
@@ -51,7 +53,7 @@ namespace simpp{
 
   class Initializer : public Event{
   public:
-    Initializer(std::shared_ptr<Environment>& ,std::shared_ptr<Process> &)
+    Initializer(const std::shared_ptr<Environment>& env,std::shared_ptr<Process> && process)
       : Event(env), process(process) {}
     void execute();
 
