@@ -10,10 +10,12 @@ using coro_t = boost::coroutines2::coroutine<std::shared_ptr<simpp::Event>>;
 typedef std::shared_ptr<simpp::Environment> Env;
 
 void generator(Env& env, boost::coroutines2::coroutine<std::shared_ptr<simpp::Event> >::push_type& sink){
+  sink(env->timeout(0));
   while(true){
     std::shared_ptr<simpp::Timeout> e = env->timeout(3);
-    std::cout << "time" << e->is_ok() << std::endl;
+    std::cout << "[pre] time:" << env->get_time() << "id :"<< e << std::endl;
     sink(e);
+    std::cout << "[post] time:" << env->get_time() << std::endl;    
   }
 }
 

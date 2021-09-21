@@ -44,7 +44,6 @@ namespace simpp{
     env->now = initial_time;
     return std::move(env);
   }
-
   void Environment::step(){
     QueueEvent item = pq.top();
     pq.pop();
@@ -55,13 +54,13 @@ namespace simpp{
     event->set_done();
     std::cout << "size:" << callbacks.size() << std::endl;   
     for(auto f : callbacks){
-      std::cout << "callback" << std::endl;
       f(event);
     }
   }
 
   void Environment::run(double until){
     while(pq.size() > 0){
+      std::cout << "step : " << get_time() << std::endl;
       step();
     }
   }
@@ -85,7 +84,7 @@ namespace simpp{
   }
 
   void Environment::schedule(std::shared_ptr<Event> event, int priority, double delay){    
-    pq.emplace(now + delay, 0, priority, event);
+    pq.emplace(now + delay, id++, priority, event);
   }
 
 } //simpp

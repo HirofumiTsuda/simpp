@@ -52,6 +52,7 @@ namespace simpp{
   private:
     double now = 0;
     std::priority_queue<QueueEvent, std::vector<QueueEvent>, std::greater<QueueEvent>> pq;
+    int id=0;
   };
   
 }

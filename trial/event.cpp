@@ -54,22 +54,24 @@ namespace simpp{
   }
 
   void Process::execute(){
-      auto ptr = std::dynamic_pointer_cast<Process>(Event::shared_from_this());
-      std::shared_ptr<Initializer> ini = std::make_shared<Initializer>(env, std::move(ptr));
-      ini->execute();
+    std::shared_ptr<Event> event = generator->get();
+    (*generator)();    
+    event->callbacks.push_back([&](std::shared_ptr<Event> &eve){
+				 resume(eve);
+			       });
   }
 
   void Process::resume(std::shared_ptr<Event>& event){
-    std::shared_ptr<Event> res;
     while(true){
       /*
       Check if the event is already triggered.
       If it is not yet, this is an error.
       Then, this process fails and the whole program should be shut down.
       */
+      std::shared_ptr<Event> res;      
       if(*generator){
         // generator is valid
-	std::cout << "res" << event->is_ok() << std::endl;	
+	std::cout << "res::!" << event->is_ok() << std::endl;	
         if(event->is_ok()){
           res = generator->get();
           (*generator)();
@@ -84,9 +86,11 @@ namespace simpp{
         env->schedule(shared_from_this());
         break;
       }
+      std::cout << "done:" << res->is_done() << std::endl;      
       if(res != nullptr && !res->is_done()){
-	event->callbacks.push_back([&](std::shared_ptr<Event> &event){
-				     resume(event);
+	std::cout << "calback set" << std::endl;
+	res->callbacks.push_back([&](std::shared_ptr<Event> &eve){
+				     resume(eve);
 				   });
 	break;
       }
@@ -110,7 +114,7 @@ namespace simpp{
         """Resumes the execution of the process with the value of *event*. If
         the process generator exits, the process itself will get triggered with
         the return value or the exception of the generator."""
-        # Mark the current process as active.
+n        # Mark the current process as active.
         self.env._active_proc = self
 
         while True:
