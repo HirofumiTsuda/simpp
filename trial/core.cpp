@@ -14,7 +14,6 @@ namespace simpp{
 
   QueueEvent::QueueEvent(const double time, const int id, const int priority, const std::shared_ptr<Event> event) 
   : time(time), id(id), priority(priority), event(event) {
-    std::cout << "queue : " << this->event->is_ok() << std::endl;
   }
   
   bool QueueEvent::operator<(const QueueEvent &other) const {
@@ -51,16 +50,14 @@ namespace simpp{
     this->now = item.get_time();
     auto callbacks = std::move(event->callbacks);
     event->callbacks.clear();
-    event->set_done();
-    std::cout << "size:" << callbacks.size() << std::endl;   
+    event->set_done();  
     for(auto f : callbacks){
       f(event);
     }
   }
 
   void Environment::run(double until){
-    while(pq.size() > 0){
-      std::cout << "step : " << get_time() << std::endl;
+    while(pq.size() > 0 && until >= get_time()){
       step();
     }
   }

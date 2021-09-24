@@ -1,5 +1,5 @@
 CC			= g++
-CFLAGS		= -lboost_context -g -O0
+CFLAGS		= -lboost_context -g -O2
 TARGET		= test
 SRCS    	= test.cpp event.cpp core.cpp
 OBJS    	= $(SRCS:.cpp=.o)
