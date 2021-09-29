@@ -18,19 +18,20 @@ namespace simpp{
     Event(const std::shared_ptr<Environment>& _env) : env(_env) {
       ok = false;
       done = false;
+      triggered = false;
     }
     virtual ~Event() {}
     // Methods
     void succeed();
     std::shared_ptr<Event> get_ptr();
     bool is_ok();
-    bool is_pending();
+    bool is_triggered();
     bool is_done();
     void set_done();
     std::vector<std::function<void(std::shared_ptr<Event> &)>> callbacks;  
   protected:
     bool ok;
-    bool pending;
+    bool triggered;
     bool done;
     std::shared_ptr<Environment> env;
   }; 

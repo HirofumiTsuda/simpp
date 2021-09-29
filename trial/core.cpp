@@ -39,10 +39,15 @@ namespace simpp{
   
 
   std::shared_ptr<Environment> Environment::create(double initial_time){
+    /*
+      Creating an environment for a simulation.
+      
+     */
     std::shared_ptr<Environment> env = std::make_shared<Environment>();
     env->now = initial_time;
     return std::move(env);
   }
+  
   void Environment::step(){
     QueueEvent item = pq.top();
     pq.pop();

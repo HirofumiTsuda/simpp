@@ -19,7 +19,7 @@ namespace simpp{
   
   class QueueEvent{
     /*
-      A class for events in a priority queue.
+      A class denoting each event in a priority queue.
       The operators < is overridden for comparison. 
     */
   public:

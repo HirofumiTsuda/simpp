@@ -14,7 +14,6 @@ namespace simpp{
   using coro_t = boost::coroutines2::coroutine<std::shared_ptr<Event> >;  
     std::shared_ptr<Event> get_ptr();
     bool is_ok();
-    bool is_pending();
 
   std::shared_ptr<Event> Event::get_ptr(){
     return shared_from_this();
@@ -24,8 +23,8 @@ namespace simpp{
     return ok;
   }
 
-  bool Event::is_pending(){
-    return pending;
+  bool Event::is_triggered(){
+    return triggered;
   }
 
   bool Event::is_done(){
@@ -40,6 +39,7 @@ namespace simpp{
 
   void Event::succeed(){
     ok = true;
+    triggered = true;
     env->schedule(shared_from_this());
   }
 
@@ -51,8 +51,7 @@ namespace simpp{
   Process::Process(const std::shared_ptr<Environment>& env, const std::function<void(coro_t::push_type&)> f)
     : Event(env){
       generator = std::make_unique<coro_t::pull_type>(coro_t::pull_type(f));  
-    }
-   
+  } 
 
   void Process::execute(){
     std::shared_ptr<Event> event = generator->get();
@@ -83,8 +82,10 @@ namespace simpp{
           Finally, this process is casted into the schedule-queue. 
         */
         env->schedule(shared_from_this());
+	this->ok = true;
         break;
-      }     
+      }
+
       if(res != nullptr && !res->is_done()){
 	      res->callbacks.push_back([this](std::shared_ptr<Event> &eve){
 				     this->resume(eve);
@@ -93,5 +94,4 @@ namespace simpp{
       }
     }
   }
-  
 }
