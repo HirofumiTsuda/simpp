@@ -16,6 +16,10 @@ namespace simpp{
   using coro_t = boost::coroutines2::coroutine<std::shared_ptr<Event> >;    
 
   std::shared_ptr<Environment> Environment::create(double initial_time){
+    /*
+      Creating an environment for a simulation.
+      
+     */
     std::shared_ptr<Environment> env = std::make_shared<Environment>();
     env->now = initial_time;
     return std::move(env);
