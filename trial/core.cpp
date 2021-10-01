@@ -7,42 +7,20 @@
 #include <boost/coroutine2/coroutine.hpp>
 
 #include "event.hpp"
+#include "timeout.hpp"
+#include "queue_event.hpp"
+#include "process.hpp"
 
 namespace simpp{
 
   using coro_t = boost::coroutines2::coroutine<std::shared_ptr<Event> >;    
-
-  QueueEvent::QueueEvent(const double time, const int id, const int priority, const std::shared_ptr<Event> event) 
-  : time(time), id(id), priority(priority), event(event) {
-  }
-  
-  bool QueueEvent::operator<(const QueueEvent &other) const {
-    if(time != other.time)
-      return (time < other.time);
-    if(priority != other.priority)
-      return (priority < other.priority);
-    if(id != other.id)
-      return (id < other.id);
-    return true;
-  }
-  
-
-  bool QueueEvent::operator>(const QueueEvent &other) const {
-    if(time != other.time)
-      return (time > other.time);
-    if(priority != other.priority)
-      return (priority > other.priority);
-    if(id != other.id)
-      return (id > other.id);
-    return true;
-  }  
-  
 
   std::shared_ptr<Environment> Environment::create(double initial_time){
     std::shared_ptr<Environment> env = std::make_shared<Environment>();
     env->now = initial_time;
     return std::move(env);
   }
+  
   void Environment::step(){
     QueueEvent item = pq.top();
     pq.pop();

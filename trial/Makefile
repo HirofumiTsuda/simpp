@@ -1,7 +1,7 @@
 CC			= g++
 CFLAGS		= -lboost_context -g -O2
 TARGET		= test
-SRCS    	= test.cpp event.cpp core.cpp
+SRCS    	= test.cpp event.cpp core.cpp timeout.cpp queue_event.cpp process.cpp
 OBJS    	= $(SRCS:.cpp=.o)
 
 

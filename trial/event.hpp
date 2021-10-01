@@ -15,43 +15,23 @@ namespace simpp{
   class Event : public std::enable_shared_from_this<Event> {
   public:
     // Constructor
-    Event(const std::shared_ptr<Environment>& _env) : env(_env) {
-      ok = false;
-      done = false;
-    }
-    virtual ~Event() {}
+    Event(const std::shared_ptr<Environment>& _env);
+    virtual ~Event();
     // Methods
     void succeed();
     std::shared_ptr<Event> get_ptr();
     bool is_ok();
     bool is_pending();
+    bool is_triggered();
     bool is_done();
     void set_done();
     std::vector<std::function<void(std::shared_ptr<Event> &)>> callbacks;  
   protected:
-    bool ok;
-    bool pending;
-    bool done;
+    bool ok=false;
+    bool triggered=false;
+    bool done=false;
     std::shared_ptr<Environment> env;
   }; 
-
-  class Timeout : public Event{
-  public:
-    Timeout(const std::shared_ptr<Environment>& env, const double delay) : Event(env), delay(delay) {}
-    void cast_into_queue();
-  private:
-    double delay;
-  };
-
-  class Process : public Event{
-  public:
-    Process(const std::shared_ptr<Environment>& , const std::function<void(coro_t::push_type&)>);
-    void execute();
-    void resume(std::shared_ptr<Event> &);
-    std::unique_ptr<coro_t::pull_type> generator;    
-  private:
-    std::shared_ptr<Event> target; 
-  };
 }
 
 #endif
