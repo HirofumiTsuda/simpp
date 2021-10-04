@@ -33,8 +33,8 @@ namespace simpp{
     auto callbacks = std::move(event->callbacks);
     event->callbacks.clear();
     event->set_done();  
-    for(auto f : callbacks){
-      f(event);
+    for(auto item : callbacks){
+      item.func(event);
     }
   }
 

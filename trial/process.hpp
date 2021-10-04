@@ -1,5 +1,5 @@
-#ifndef SIM_PROCESS_HPP
-#define SIM_PROCESS_HPP
+#ifndef SIMPP_PROCESS_HPP
+#define SIMPP_PROCESS_HPP
 
 #include <memory>
 #include <functional>

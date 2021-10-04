@@ -12,32 +12,27 @@
 
 namespace simpp{
   using coro_t = boost::coroutines2::coroutine<std::shared_ptr<Event> >;  
-<<<<<<< HEAD
 
-  Event::Event(const std::shared_ptr<Environment>& _env) : env(_env) {
-    ok=false;
-    triggered=false;
-    done=false;
-  }
+  Event::Event(const std::shared_ptr<Environment>& _env) : env(_env) {}
   Event::~Event() {}  
-=======
-    std::shared_ptr<Event> get_ptr();
-    bool is_ok();
->>>>>>> 5e9db70bed74cf77fb7d2a8f187e9bde135e286e
 
   std::shared_ptr<Event> Event::get_ptr(){
     return shared_from_this();
   }
 
-  bool Event::is_ok(){
+  std::shared_ptr<Environment> Event::get_env(){
+    return env;
+  }  
+
+  bool Event::is_ok() const {
     return ok;
   }
 
-  bool Event::is_triggered(){
+  bool Event::is_triggered() const {
     return triggered;
   }
 
-  bool Event::is_done(){
+  bool Event::is_done() const {
     return done;
   }
 
@@ -55,60 +50,21 @@ namespace simpp{
     triggered = true;
     env->schedule(shared_from_this());
   }
-<<<<<<< HEAD
-  
-=======
 
-  void Timeout::cast_into_queue(){
-    ok = true;
-    env->schedule(shared_from_this(), 1, delay);
+  void Event::add_callback(std::function<void(std::shared_ptr<Event> &)> f,
+			   std::shared_ptr<Event> parent,
+			   bool check){
+    callbacks.emplace_back(f, parent, check);
   }
 
-  Process::Process(const std::shared_ptr<Environment>& env, const std::function<void(coro_t::push_type&)> f)
-    : Event(env){
-      generator = std::make_unique<coro_t::pull_type>(coro_t::pull_type(f));  
-  } 
-
-  void Process::execute(){
-    std::shared_ptr<Event> event = generator->get();
-    event->callbacks.push_back([&](std::shared_ptr<Event> &eve){
-				 resume(eve);
-			       });
+  void Event::remove_check_callback(std::shared_ptr<Event> parent){
+    /*
+      The detail of this method is defined in sub-classes.
+      The role of this method is to remove "check" function from
+      the callbacks.
+    */
+    return;
   }
 
-  void Process::resume(std::shared_ptr<Event>& event){
-    while(true){
-      /*
-      Check if the event is already triggered.
-      If it is not yet, this is an error.
-      Then, this process fails and the whole program should be shut down.
-      */
-      std::shared_ptr<Event> res;      
-      if(*generator){
-        // generator is valid
-        if(event->is_ok()){
-          (*generator)();	  
-          res = generator->get();
-        }else{
-          throw std::runtime_error("Generator is invalid");
-        }
-      }else{
-        /*
-          This process has just finished. 
-          Finally, this process is casted into the schedule-queue. 
-        */
-        env->schedule(shared_from_this());
-	this->ok = true;
-        break;
-      }
 
-      if(res != nullptr && !res->is_done()){
-	      res->callbacks.push_back([this](std::shared_ptr<Event> &eve){
-				     this->resume(eve);
-				   });
-	break;
-      }
-    }
-  }
->>>>>>> 5e9db70bed74cf77fb7d2a8f187e9bde135e286e
 }

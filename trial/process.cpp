@@ -19,9 +19,10 @@ namespace simpp{
 
   void Process::execute(){
     std::shared_ptr<Event> event = generator->get();
-    event->callbacks.push_back([&](std::shared_ptr<Event> &eve){
-				 resume(eve);
-			       });
+    event->add_callback(
+	[this](std::shared_ptr<Event> &eve){
+	   this->resume(eve);
+	}, shared_from_this(),false);
   }
 
   void Process::resume(std::shared_ptr<Event>& event){
@@ -50,10 +51,10 @@ namespace simpp{
         break;
       }     
       if(res != nullptr && !res->is_done()){
-	      res->callbacks.push_back([this](std::shared_ptr<Event> &eve){
-				     this->resume(eve);
-				   });
-	break;
+	  res->add_callback([this](std::shared_ptr<Event> &eve){
+			      this->resume(eve);
+			    }, shared_from_this(),false);
+	  break;
       }
     }
   }

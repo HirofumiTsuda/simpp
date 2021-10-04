@@ -10,7 +10,7 @@ namespace simpp{
   : time(time), id(id), priority(priority), event(event) {
   }
   
-  bool QueueEvent::operator<(const QueueEvent &other) const {
+  bool QueueEvent::operator<(const QueueEvent& other) const {
     if(time != other.time)
       return (time < other.time);
     if(priority != other.priority)
@@ -20,7 +20,7 @@ namespace simpp{
     return true;
   }
   
-  bool QueueEvent::operator>(const QueueEvent &other) const {
+  bool QueueEvent::operator>(const QueueEvent& other) const {
     if(time != other.time)
       return (time > other.time);
     if(priority != other.priority)
@@ -28,5 +28,13 @@ namespace simpp{
     if(id != other.id)
       return (id > other.id);
     return true;
-  }  
+  }
+
+  std::shared_ptr<Event> QueueEvent::get_event() const {
+    return event;
+  }
+  
+  double QueueEvent::get_time() const {
+    return time;
+  }      
 }

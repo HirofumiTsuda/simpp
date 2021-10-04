@@ -1,5 +1,5 @@
-#ifndef SIM_TIMEOUT_HPP
-#define SIM_TIMEOUT_HPP
+#ifndef SIMPP_TIMEOUT_HPP
+#define SIMPP_TIMEOUT_HPP
 
 #include <memory>
 

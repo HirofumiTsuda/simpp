@@ -1,53 +1,38 @@
-#ifndef SIM_EVENT_HPP
-#define SIM_EVENT_HPP
+#ifndef SIMPP_EVENT_HPP
+#define SIMPP_EVENT_HPP
 
-#include <iostream>
 #include <memory>
 #include <vector>
 #include <functional>
-#include <boost/coroutine2/coroutine.hpp>
 
 #include "core.hpp"
+#include "callback.hpp"
 
 namespace simpp{
-  using coro_t = boost::coroutines2::coroutine<std::shared_ptr<Event> >;
+
   
   class Event : public std::enable_shared_from_this<Event> {
   public:
     // Constructor
-<<<<<<< HEAD
-    Event(const std::shared_ptr<Environment>& _env);
+    Event(const std::shared_ptr<Environment>& );
     virtual ~Event();
-=======
-    Event(const std::shared_ptr<Environment>& _env) : env(_env) {
-      ok = false;
-      done = false;
-      triggered = false;
-    }
-    virtual ~Event() {}
->>>>>>> 5e9db70bed74cf77fb7d2a8f187e9bde135e286e
+    // variables
+    std::vector<Callback> callbacks;    
     // Methods
     void succeed();
     std::shared_ptr<Event> get_ptr();
-    bool is_ok();
-<<<<<<< HEAD
-    bool is_pending();
-=======
->>>>>>> 5e9db70bed74cf77fb7d2a8f187e9bde135e286e
-    bool is_triggered();
-    bool is_done();
+    std::shared_ptr<Environment> get_env();
+    bool is_ok() const;
+    bool is_triggered() const;
+    bool is_done() const;
     void set_done();
-    std::vector<std::function<void(std::shared_ptr<Event> &)>> callbacks;  
+    void add_callback(std::function<void(std::shared_ptr<Event> &)>, std::shared_ptr<Event>, bool);
+    virtual void remove_check_callback(std::shared_ptr<Event>);
   protected:
-<<<<<<< HEAD
     bool ok=false;
     bool triggered=false;
     bool done=false;
-=======
-    bool ok;
-    bool triggered;
-    bool done;
->>>>>>> 5e9db70bed74cf77fb7d2a8f187e9bde135e286e
+    int check_locator = -1;
     std::shared_ptr<Environment> env;
   }; 
 }

@@ -1,5 +1,5 @@
-#ifndef SIM_CORE_HPP
-#define SIM_CORE_HPP
+#ifndef SIMPP_CORE_HPP
+#define SIMPP_CORE_HPP
 
 #include <iostream>
 #include <functional>
@@ -16,29 +16,7 @@ namespace simpp{
   class Timeout;
   class QueueEvent;
 
-  using coro_t = boost::coroutines2::coroutine<std::shared_ptr<Event> >;  
-<<<<<<< HEAD
- 
-=======
-  
-  class QueueEvent{
-    /*
-      A class denoting each event in a priority queue.
-      The operators < is overridden for comparison. 
-    */
-  public:
-    QueueEvent(const double, const int, const int, const std::shared_ptr<Event>);
-    bool operator<(const QueueEvent &) const;
-    bool operator>(const QueueEvent &) const;
-    std::shared_ptr<Event> get_event(){ return event; };
-    double get_time(){ return time; };    
-  private:
-    double time;
-    int id;
-    int priority;
-    std::shared_ptr<Event> event;
-  };
->>>>>>> 5e9db70bed74cf77fb7d2a8f187e9bde135e286e
+  using coro_t = boost::coroutines2::coroutine<std::shared_ptr<Event> >;
   
   class Environment : public std::enable_shared_from_this<Environment>{
     /*
