@@ -1,80 +1,182 @@
 
-chain.cpp,361
-class Holder{Holder8,172
-  int x;x10,195
-  std::unique_ptr<coro_t::pull_type> source;  source11,204
-  Holder(std::function<void(coro_t::push_type&)> f){Holder13,259
-  virtual ~Holder() {};~Holder16,388
-  int yield(){yield17,412
-void generator(int x, boost::coroutines2::coroutine<int>::push_type& sink){generator24,497
-int main(void){main41,860
+src/core.cpp,622
+namespace simpp{simpp14,220
+  std::shared_ptr<Environment> Environment::create(double initial_time){create18,316
+  void Environment::step(){step28,594
+  void Environment::run(double until){run41,908
+  double Environment::get_time(){ get_time47,1023
+  std::shared_ptr<Event> Environment::event(){event51,1086
+  std::shared_ptr<Timeout> Environment::timeout(double delay){timeout55,1194
+  std::shared_ptr<Process> Environment::process(const std::function<void(coro_t::push_type&)> f){process61,1416
+  void Environment::schedule(std::shared_ptr<Event> event, int priority, double delay){    schedule65,1580
 
-event.cpp,598
+src/test_process.cpp,518
+typedef std::shared_ptr<simpp::Environment> Env;Env11,262
+struct Intervene{Intervene13,312
+  std::shared_ptr<simpp::Event> eve;eve14,330
+  Env env;env15,367
+  Intervene(Env &env) : env(env) { eve = env->event(); }Intervene16,378
+void generator2(Env& env, boost::coroutines2::coroutine<std::shared_ptr<simpp::Event> >::push_type& sink){generator219,439
+void generator1(Env& env, boost::coroutines2::coroutine<std::shared_ptr<simpp::Event> >::push_type& sink){generator125,684
+int main(void){main39,1189
+
+src/condition.cpp,474
+namespace simpp{simpp15,210
+  Condition::Condition(const std::shared_ptr<Environment>& env,Condition16,227
+  void Condition::set_callbacks(){set_callbacks25,504
+  void Condition::remove_check_callback(const std::shared_ptr<Event> parent){remove_check_callback49,1215
+  bool Condition::evaluate(){evaluate63,1653
+  void Condition::check(std::shared_ptr<Event>& event){check67,1768
+  void Condition::build_value(std::shared_ptr<Event>& event){build_value77,2030
+
+src/test_generator.cpp,548
+typedef std::shared_ptr<simpp::Environment> Env;Env14,315
+typedef std::shared_ptr<simpp::Event> Eve;Eve15,364
+struct Intervene{Intervene17,408
+  Env env;env18,426
+  Eve event;event19,437
+  Intervene(Env env) : env(env) {Intervene20,450
+void generator1(Env& env, std::shared_ptr<Intervene> intervene, coro_t::push_type& sink){generator125,518
+void generator2(Env& env, std::shared_ptr<Intervene> intervene, boost::coroutines2::coroutine<std::shared_ptr<simpp::Event> >::push_type& sink){generator237,937
+int main(void){main49,1417
+
+src/queue_event.cpp,449
+namespace simpp{simpp7,69
+  QueueEvent::QueueEvent(const double time, const int id, const int priority, const std::shared_ptr<Event> event) QueueEvent9,89
+  bool QueueEvent::operator<(const QueueEvent& other) const {operator <13,270
+  bool QueueEvent::operator>(const QueueEvent& other) const {operator >23,547
+  std::shared_ptr<Event> QueueEvent::get_event() const {get_event33,822
+  double QueueEvent::get_time() const {get_time37,904
+
+src/anyof.cpp,139
+namespace simpp{simpp8,83
+  AnyOf::AnyOf(const std::shared_ptr<Environment>& env,AnyOf10,103
+  bool AnyOf::evaluate(){evaluate15,274
+
+src/test.cpp,384
+typedef std::shared_ptr<simpp::Environment> Env;Env14,315
+typedef std::shared_ptr<simpp::Event> Eve;Eve15,364
+struct Intervene{Intervene17,408
+  Env env;env18,426
+  Eve event;event19,437
+  Intervene(Env env) : env(env) {Intervene20,450
+void generator1(Env& env, std::shared_ptr<Intervene> intervene, coro_t::push_type& sink){generator125,518
+int main(void){main36,886
+
+src/timeout.cpp,178
+namespace simpp{simpp6,66
+  Timeout::Timeout(const std::shared_ptr<Environment>& env, const double delay)Timeout7,83
+  void Timeout::cast_into_queue(){cast_into_queue9,201
+
+src/process.cpp,265
+namespace simpp{simpp10,149
+  Process::Process(const std::shared_ptr<Environment>& env, const std::function<void(coro_t::push_type&)> f)Process14,243
+  void Process::execute(){execute20,460
+  void Process::resume(std::shared_ptr<Event>& event){resume28,662
+
+src/event.cpp,698
 namespace simpp{simpp13,186
-  std::shared_ptr<Event> Event::get_ptr(){get_ptr19,360
-  bool Event::is_ok(){is_ok23,439
-  bool Event::is_pending(){is_pending27,482
-  bool Event::is_done(){is_done31,535
-  void Event::set_done(){set_done35,582
-  void Event::succeed(){succeed41,701
-  void Timeout::cast_into_queue(){cast_into_queue45,770
-  Process::Process(const std::shared_ptr<simpp::Environment>& env, const std::function<void(coro_t::push_type&)> f)Process49,859
-  void Process::resume(std::shared_ptr<Event> &event){resume54,1076
-  void Initializer::execute(){execute84,1884
+  Event::Event(const std::shared_ptr<Environment>& _env) : env(_env) {}Event16,279
+  Event::~Event() {}  ~Event17,351
+  std::shared_ptr<Event> Event::get_ptr(){get_ptr19,375
+  std::shared_ptr<Environment> Event::get_env(){get_env23,454
+  bool Event::is_ok() const {is_ok27,526
+  bool Event::is_triggered() const {is_triggered31,576
+  bool Event::is_done() const {is_done35,640
+  void Event::set_done(){set_done39,694
+  void Event::succeed(){succeed45,813
+  void Event::add_callback(std::function<void(std::shared_ptr<Event> &)> f,add_callback54,1007
+  void Event::remove_check_callback(std::shared_ptr<Event> parent){remove_check_callback60,1190
 
-main.cpp,26
-int main(void){main7,81
+src/allof.cpp,139
+namespace simpp{simpp8,83
+  AllOf::AllOf(const std::shared_ptr<Environment>& env,AllOf10,103
+  bool AllOf::evaluate(){evaluate15,274
 
-Makefile,169
-CC			= g++CC1,0
-CFLAGS		= -lboost_contextCFLAGS2,11
-TARGET		= mainTARGET3,37
-SRCS    	= main.cpp event.cpp core.cppSRCS4,52
-OBJS    	= $(SRCS:.cpp=.o)OBJS5,91
+include/core.hpp,321
+#define SIMPP_CORE_HPPSIMPP_CORE_HPP2,23
+namespace simpp{simpp12,186
+  class Environment : public std::enable_shared_from_this<Environment>{Environment21,350
+    double now = 0;now36,927
+    std::priority_queue<QueueEvent, std::vector<QueueEvent>, std::greater<QueueEvent>> pq;pq37,947
+    int id=0;id38,1038
 
-core.hpp,463
-#define SIM_CORE_HPPSIM_CORE_HPP2,21
-namespace simpp{simpp9,117
-  class QueueEvent{QueueEvent15,173
-    double time;time26,541
-    int id;id27,558
-    int priority;priority28,570
-    std::shared_ptr<Event> event;event29,588
-  class Environment : public std::enable_shared_from_this<Environment>{Environment32,630
-    double now = 0;now44,1076
-    std::priority_queue<QueueEvent, std::vector<QueueEvent>, std::greater<QueueEvent>> pq;pq45,1096
+include/queue_event.hpp,253
+#define SIMPP_QUEUEEVENT_HPPSIMPP_QUEUEEVENT_HPP2,29
+namespace simpp{simpp6,78
+  class QueueEvent{QueueEvent10,114
+    double time;time22,521
+    int id;id23,538
+    int priority;priority24,550
+    std::shared_ptr<Event> event;event25,568
 
-core.cpp,706
-namespace simpp{simpp8,82
-  QueueEvent::QueueEvent(const double time, const int id, const int priority, const std::shared_ptr<Event> event) QueueEvent10,100
-  bool QueueEvent::operator<(const QueueEvent &other) const {operator <13,278
-  bool QueueEvent::operator>(const QueueEvent &other) const {operator >24,556
-  std::shared_ptr<Environment> Environment::create(double initial_time){create35,836
-  double Environment::get_time(){ get_time41,1044
-  std::shared_ptr<Event> Environment::event(){event46,1108
-  std::shared_ptr<Timeout> Environment::timeout(double delay){timeout50,1217
-  void Environment::schedule(std::shared_ptr<Event> event, int priority, double delay){ schedule56,1439
+include/timeout.hpp,155
+#define SIMPP_TIMEOUT_HPPSIMPP_TIMEOUT_HPP2,26
+namespace simpp{simpp8,94
+  class Timeout : public Event{Timeout11,135
+    double delay;delay16,282
 
-generator_test.cpp,0
+include/operator.hpp,323
+#define SIMPP_OPERATOR_HPPSIMPP_OPERATOR_HPP2,27
+namespace simpp{simpp10,138
+  class Ops{Ops12,156
+    static std::shared_ptr<AllOf> all(std::shared_ptr<Event> left, std::shared_ptr<Event> right){all14,179
+    static std::shared_ptr<AnyOf> any(std::shared_ptr<Event> left, std::shared_ptr<Event> right){any20,420
 
-event.hpp,1098
-#define SIM_EVENT_HPPSIM_EVENT_HPP2,22
-namespace simpp{simpp12,187
-  class Event : public std::enable_shared_from_this<Event> {Event15,280
-    Event(const std::shared_ptr<Environment>& _env) : env(_env) {}Event18,370
-    std::vector<std::function<void(std::shared_ptr<Event> &)>> callbacks;  callbacks26,592
-    bool ok;ok28,681
-    bool defused;defused29,694
-    bool pending;pending30,712
-    bool done;done31,730
-    std::shared_ptr<Environment> env;env32,745
-  class Timeout : public Event{Timeout35,790
-    Timeout(const std::shared_ptr<Environment>& env, const double delay) : Event(env), delay(delay) {}Timeout37,832
-    double delay;delay40,974
-  class Process : public Event{Process43,998
-   std::unique_ptr<coro_t::pull_type> generator;generator48,1191
-   std::shared_ptr<Event> target; target49,1240
-  class Initializer : public Event{Initializer52,1281
-    Initializer(std::shared_ptr<Environment>& ,std::shared_ptr<Process> &)Initializer54,1327
-    std::shared_ptr<Process> process; process59,1474
-    std::shared_ptr<Event> event; event60,1513
+include/callback.hpp,340
+#define SIMPP_CALLBACK_HPPSIMPP_CALLBACK_HPP2,27
+namespace simpp{simpp7,96
+  class Callback{Callback10,129
+    Callback(std::function<void(std::shared_ptr<Event> &)> func,Callback12,157
+    std::function<void(std::shared_ptr<Event> &)> func;func16,329
+    std::shared_ptr<Event> parent;parent17,385
+    bool check;check18,420
+
+include/process.hpp,247
+#define SIMPP_PROCESS_HPPSIMPP_PROCESS_HPP2,26
+namespace simpp{simpp10,158
+  class Process : public Event{Process15,275
+    std::unique_ptr<coro_t::pull_type> generator;    generator20,478
+    std::shared_ptr<Event> target; target22,543
+
+include/allof.hpp,165
+#define SIMPP_ALLOF_HPPSIMPP_ALLOF_HPP2,24
+namespace simpp{simpp7,76
+  class AllOf : public Condition {AllOf9,96
+    bool evaluate() override;override13,252
+
+include/anyof.hpp,165
+#define SIMPP_ANYOF_HPPSIMPP_ANYOF_HPP2,24
+namespace simpp{simpp7,76
+  class AnyOf : public Condition {AnyOf9,96
+    bool evaluate() override;override13,252
+
+include/event.hpp,410
+#define SIMPP_EVENT_HPPSIMPP_EVENT_HPP2,24
+namespace simpp{simpp11,153
+  class Event : public std::enable_shared_from_this<Event> {Event14,174
+    std::vector<Callback> callbacks;    callbacks20,352
+    bool ok=false;ok32,789
+    bool triggered=false;triggered33,808
+    bool done=false;done34,834
+    int check_locator = -1;check_locator35,855
+    std::shared_ptr<Environment> env;env36,883
+
+include/condition.hpp,316
+#define SIMPP_CONDITION_HPPSIMPP_CONDITION_HPP2,28
+namespace simpp{simpp11,139
+  class Condition : public Event {Condition15,181
+    void remove_check_callback(const std::shared_ptr<Event>) override;override19,356
+    std::vector<std::shared_ptr<Event>> events;events24,558
+    int count = 0;count25,606
+
+Makefile,366
+SUFFIXES =SUFFIXES21,545
+SHELL = /bin/shSHELL39,903
+CMAKE_COMMAND = /usr/bin/cmakeCMAKE_COMMAND42,944
+RM = /usr/bin/cmake -E remove -fRM45,1008
+EQUALS = =EQUALS48,1077
+CMAKE_SOURCE_DIR = /home/h.tsuda/projects/NEC2021.01/simpp.lib/simppCMAKE_SOURCE_DIR51,1146
+CMAKE_BINARY_DIR = /home/h.tsuda/projects/NEC2021.01/simpp.lib/simppCMAKE_BINARY_DIR54,1272
+
+.dir-locals.el,0

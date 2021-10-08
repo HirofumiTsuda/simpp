@@ -22,7 +22,7 @@ namespace simpp{
      */
     std::shared_ptr<Environment> env = std::make_shared<Environment>();
     env->now = initial_time;
-    return std::move(env);
+    return env;
   }
   
   void Environment::step(){

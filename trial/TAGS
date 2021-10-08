@@ -1,80 +1,0 @@
-
-chain.cpp,361
-class Holder{Holder8,172
-  int x;x10,195
-  std::unique_ptr<coro_t::pull_type> source;  source11,204
-  Holder(std::function<void(coro_t::push_type&)> f){Holder13,259
-  virtual ~Holder() {};~Holder16,388
-  int yield(){yield17,412
-void generator(int x, boost::coroutines2::coroutine<int>::push_type& sink){generator24,497
-int main(void){main41,860
-
-event.cpp,598
-namespace simpp{simpp13,186
-  std::shared_ptr<Event> Event::get_ptr(){get_ptr19,360
-  bool Event::is_ok(){is_ok23,439
-  bool Event::is_pending(){is_pending27,482
-  bool Event::is_done(){is_done31,535
-  void Event::set_done(){set_done35,582
-  void Event::succeed(){succeed41,701
-  void Timeout::cast_into_queue(){cast_into_queue45,770
-  Process::Process(const std::shared_ptr<simpp::Environment>& env, const std::function<void(coro_t::push_type&)> f)Process49,859
-  void Process::resume(std::shared_ptr<Event> &event){resume54,1076
-  void Initializer::execute(){execute84,1884
-
-main.cpp,26
-int main(void){main7,81
-
-Makefile,169
-CC			= g++CC1,0
-CFLAGS		= -lboost_contextCFLAGS2,11
-TARGET		= mainTARGET3,37
-SRCS    	= main.cpp event.cpp core.cppSRCS4,52
-OBJS    	= $(SRCS:.cpp=.o)OBJS5,91
-
-core.hpp,463
-#define SIM_CORE_HPPSIM_CORE_HPP2,21
-namespace simpp{simpp9,117
-  class QueueEvent{QueueEvent15,173
-    double time;time26,541
-    int id;id27,558
-    int priority;priority28,570
-    std::shared_ptr<Event> event;event29,588
-  class Environment : public std::enable_shared_from_this<Environment>{Environment32,630
-    double now = 0;now44,1076
-    std::priority_queue<QueueEvent, std::vector<QueueEvent>, std::greater<QueueEvent>> pq;pq45,1096
-
-core.cpp,706
-namespace simpp{simpp8,82
-  QueueEvent::QueueEvent(const double time, const int id, const int priority, const std::shared_ptr<Event> event) QueueEvent10,100
-  bool QueueEvent::operator<(const QueueEvent &other) const {operator <13,278
-  bool QueueEvent::operator>(const QueueEvent &other) const {operator >24,556
-  std::shared_ptr<Environment> Environment::create(double initial_time){create35,836
-  double Environment::get_time(){ get_time41,1044
-  std::shared_ptr<Event> Environment::event(){event46,1108
-  std::shared_ptr<Timeout> Environment::timeout(double delay){timeout50,1217
-  void Environment::schedule(std::shared_ptr<Event> event, int priority, double delay){ schedule56,1439
-
-generator_test.cpp,0
-
-event.hpp,1098
-#define SIM_EVENT_HPPSIM_EVENT_HPP2,22
-namespace simpp{simpp12,187
-  class Event : public std::enable_shared_from_this<Event> {Event15,280
-    Event(const std::shared_ptr<Environment>& _env) : env(_env) {}Event18,370
-    std::vector<std::function<void(std::shared_ptr<Event> &)>> callbacks;  callbacks26,592
-    bool ok;ok28,681
-    bool defused;defused29,694
-    bool pending;pending30,712
-    bool done;done31,730
-    std::shared_ptr<Environment> env;env32,745
-  class Timeout : public Event{Timeout35,790
-    Timeout(const std::shared_ptr<Environment>& env, const double delay) : Event(env), delay(delay) {}Timeout37,832
-    double delay;delay40,974
-  class Process : public Event{Process43,998
-   std::unique_ptr<coro_t::pull_type> generator;generator48,1191
-   std::shared_ptr<Event> target; target49,1240
-  class Initializer : public Event{Initializer52,1281
-    Initializer(std::shared_ptr<Environment>& ,std::shared_ptr<Process> &)Initializer54,1327
-    std::shared_ptr<Process> process; process59,1474
-    std::shared_ptr<Event> event; event60,1513
