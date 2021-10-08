@@ -1,5 +1,6 @@
 # custom
 build/
+.vscode/
 .*.el
 
 # Prerequisites
