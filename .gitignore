@@ -1,6 +1,6 @@
 # custom
 build/
-.dir-locals.el
+.*.el
 
 # Prerequisites
 *.d
