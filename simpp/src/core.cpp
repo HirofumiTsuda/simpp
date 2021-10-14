@@ -59,7 +59,9 @@ namespace simpp{
   }
 
   std::shared_ptr<Process> Environment::process(const std::function<void(coro_t::push_type&)> f){
-    return std::make_shared<Process>(shared_from_this(), f);
+    auto p = std::make_shared<Process>(shared_from_this(), f);
+    p->execute();
+    return p;
   }
 
   void Environment::schedule(std::shared_ptr<Event> event, int priority, double delay){    
