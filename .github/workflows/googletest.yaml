@@ -16,6 +16,9 @@ jobs:
     - name: install boost
       run: |
         sudo apt install -y libboost-all-dev
+    - name: install googletest
+      run: |
+        sudo apt install libgtest-dev
     - name: build
       run: |   # run: アクションで実行するコマンドを記載します。
         mkdir build
