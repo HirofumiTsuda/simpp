@@ -2,6 +2,7 @@
 build/
 .vscode/
 .*.el
+googletest/
 
 # Prerequisites
 *.d

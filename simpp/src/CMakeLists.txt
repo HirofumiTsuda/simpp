@@ -13,7 +13,7 @@ add_library(simpp
 )
 
 if(Boost_FOUND)
-  target_include_directories(simpp PUBLIC ${Boost_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include )
+  target_include_directories(simpp PUBLIC ${Boost_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/simpp/include )
   target_link_libraries(simpp ${Boost_LIBRARIES} )
   target_compile_options(simpp PUBLIC -lboost_context -O2 -Wall)
   target_compile_features(simpp PUBLIC cxx_std_17)
