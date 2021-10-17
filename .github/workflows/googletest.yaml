@@ -1,0 +1,32 @@
+name: GoogleTest 
+
+on: 
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest  # ubuntu latest (20.04) does not contain BOOST
+
+    steps: 
+    - uses: actions/checkout@v2
+    - name: install boost
+      run: |
+        sudo apt install -y libboost-all-dev
+    - name: install googletest
+      run: |
+        sudo apt install libgtest-dev
+    - name: build
+      run: |   # run: アクションで実行するコマンドを記載します。
+        mkdir build
+        cd build
+        cmake ..
+        make
+        cd ..
+    - name: googletest
+      working-directory: ./build   # working-directory: アクションで実行する作業ディレクトリを記載します。
+      run: |
+        make test
