@@ -9,10 +9,13 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-18.04  # ubuntu latest (20.04) does not contain BOOST
+    runs-on: ubuntu-latest  # ubuntu latest (20.04) does not contain BOOST
 
     steps: 
     - uses: actions/checkout@v2
+    - name: install boost
+      run: |
+        sudo apt install -y libboost-all-dev
     - name: build
       run: |   # run: アクションで実行するコマンドを記載します。
         mkdir build

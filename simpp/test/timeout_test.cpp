@@ -18,22 +18,42 @@ using coro_t = boost::coroutines2::coroutine<std::shared_ptr<simpp::Event>>;
 typedef std::shared_ptr<simpp::Environment> Env;
 typedef std::shared_ptr<simpp::Event> Eve;
 
+namespace{
 
-void generator(Env& env, double time, std::vector<double>* v, coro_t::push_type& sink){
+void generator(Env& env, double duration, std::vector<double>* v, coro_t::push_type& sink){
   while(true){
-    std::shared_ptr<simpp::Timeout> e = env->timeout(DURATION);
+    std::shared_ptr<simpp::Timeout> e = env->timeout(duration);
     sink(e);
     v->push_back(env->get_time());
   }
 }
 
-testing::
-int main(void){
+
+
+std::vector<double> run(int duration){
   std::shared_ptr<simpp::Environment> env = simpp::Environment::create();
   std::vector<double> v;
-  std::function<void(coro_t::push_type&)> f = std::bind(generator, env, &v, std::placeholders::_1);
+  std::function<void(coro_t::push_type&)> f = std::bind(generator, env, duration, &v, std::placeholders::_1);
   env->process(f);
   env->run(1000);
-  for(double d : v)
-    std::cout << d << std::endl;
+  return v;
 }
+
+TEST(FUNCTION_TEST, NORMAL_TIMEOUT){
+  double d = 10;
+  double t = d;
+  std::vector<double> v = run(d);
+  for(double num : v){
+    ASSERT_EQ(num, t);
+    t += d;
+  }
+}
+
+TEST(FUNCTION_TEST, ABNORMAL_TIMEOUT){
+  double d = -1;
+  ASSERT_DEATH({
+      run(d);
+    }, "");
+} 
+} // namespace
+
