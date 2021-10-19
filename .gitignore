@@ -3,6 +3,7 @@ build/
 .vscode/
 .*.el
 googletest/
+TAGS
 
 # Prerequisites
 *.d

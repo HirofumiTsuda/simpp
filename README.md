@@ -1,3 +1,5 @@
+)[![googletest](https://github.com/HirofumiTsuda/simpp/blob/main/.github/workflows/googletest.yaml/badge.svg)](https://github.com/HirofumiTsuda/simpp/blob/main/.github/workflows/googletest.yaml)
+
 # simpp
 
 Sim++ (sim-plus-plus) is a library for discrete simulation which aims to be a C++ version of the great
