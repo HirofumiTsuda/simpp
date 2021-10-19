@@ -1,4 +1,4 @@
-[![googletest](https://github.com/HirofumiTsuda/simpp/blob/main/.github/workflows/googletest.yaml/badge.svg)](https://github.com/HirofumiTsuda/simpp/blob/main/.github/workflows/googletest.yaml)
+[![GoogleTest](https://github.com/HirofumiTsuda/simpp/actions/workflows/googletest.yaml/badge.svg)](https://github.com/HirofumiTsuda/simpp/actions/workflows/googletest.yaml)
 
 # simpp
 
