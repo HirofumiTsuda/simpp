@@ -9,6 +9,7 @@
 #include "process.hpp"
 #include "operator.hpp"
 
+#include "gtest/gtest.h"
 
 using namespace simpp;
 using coro_t = boost::coroutines2::coroutine<std::shared_ptr<simpp::Event>>;
@@ -25,35 +26,46 @@ struct Intervene{
 
 void generator1(Env& env, std::shared_ptr<Intervene> intervene, coro_t::push_type& sink){
   while(true){
-    std::shared_ptr<simpp::Timeout> e = env->timeout(31);
+    std::shared_ptr<simpp::Timeout> e = env->timeout(10);
     sink(e);
-    std::cout << "[1] timeout is done " << env->get_time() << std::endl;
     if(!intervene->event->is_triggered()){
-      std::cout << "[1] succeed : " << env->get_time() << std::endl;          
       intervene->event->succeed();
     }
   }
 }
 
 
-void generator2(Env& env, std::shared_ptr<Intervene> intervene, boost::coroutines2::coroutine<std::shared_ptr<simpp::Event> >::push_type& sink){
+void generator2(Env& env, std::shared_ptr<Intervene> intervene,
+		std::vector<double>* v, coro_t::push_type& sink){
   while(true){
-    std::shared_ptr<simpp::Timeout> e = env->timeout(17);
+    std::shared_ptr<simpp::Timeout> e = env->timeout(4);
     sink(e);
-    std::cout << "[2] waiting : " << env->get_time() << std::endl;
     sink(intervene->event);
-    std::cout << "[2] release : " << env->get_time() << std::endl;
     if(intervene->event->is_triggered())
       intervene->event = env->event();
+    v->push_back(env->get_time());
+    std::cout << env->get_time() << std::endl;
   }
 }
 
-int main(void){
+
+void run(std::vector<double> *v){
   std::shared_ptr<simpp::Environment> env = simpp::Environment::create();
   std::shared_ptr<Intervene> intervene = std::make_shared<Intervene>(env);
   std::function<void(coro_t::push_type&)> f = std::bind(generator1, env, intervene, std::placeholders::_1);
   env->process(f);
-  std::function<void(coro_t::push_type&)> g = std::bind(generator2, env, intervene, std::placeholders::_1);
+  std::function<void(coro_t::push_type&)> g = std::bind(generator2, env, intervene, v, std::placeholders::_1);
   env->process(g);
   env->run(1000);
+}
+
+
+TEST(FUNCTION_TEST, INTERACTION_TEST){
+  std::vector<double> v;
+  run(&v);
+  double t = 10;
+  for(double tau : v){
+    ASSERT_EQ(t, tau);
+    t += 10;
+  }
 }

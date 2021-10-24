@@ -28,3 +28,16 @@ target_link_libraries(
   )
 
 gtest_discover_tests(test_condition)
+
+# process
+add_executable(test_interact interact_test.cpp)
+
+target_link_libraries(
+  test_interact
+  simpp
+  GTest::GTest
+  GTest::Main
+  pthread
+  )
+
+gtest_discover_tests(test_interact)
